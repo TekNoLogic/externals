@@ -46,9 +46,10 @@ f:SetScript("OnHide", function() nextup = nil end)
 f:SetScript("OnUpdate", function(self)
 	if not nextup then return f:Hide() end
 	if GetTime() >= nextup.time then
-		if nextup.period then nextup.time = GetTime() + nextup.period
+		local endloop = nextup.func()
+		if nextup.period and not endloop then
+			nextup.time = GetTime() + nextup.period
 		else funcs[nextup] = nil end
-		nextup.func()
 		SetNextTime()
 	end
 end)
