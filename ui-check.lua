@@ -26,3 +26,11 @@ function ns.NewCheckBox(parent, size, ...)
 
 	return check
 end
+
+
+-- Creates a label next to a checkbox
+function ns.NewCheckLabel(check, text)
+	local fs = check:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	fs:SetPoint("LEFT", check, "RIGHT", 0, 1)
+	fs:SetText(text)
+end
