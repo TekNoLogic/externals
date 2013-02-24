@@ -9,6 +9,7 @@ end
 
 local frame = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
 frame.name = ns.BaseConfig and "About" or myname
+frame.parent = ns.BaseConfig
 frame:Hide()
 frame:SetScript("OnShow", function(frame)
 	local fields = {"Version", "Author", "X-Category", "X-License", "X-Email", "X-Website", "X-Credits"}
