@@ -17,14 +17,47 @@ end
 
 
 -- Handle special OnLoad code when our addon has loaded, if present
+-- Also initializes the savedvar for us, if ns.dbname or ns.dbpcname is set
 -- If ns.ADDON_LOADED is defined, the ADDON_LOADED event is not unregistered
 local function ProcessOnLoad(arg1)
-	if not ns.OnLoad then ProcessOnLoad = nil end
-	if arg1 == myname and ns.OnLoad then
+	if arg1 ~= myname then return end
+
+	if ns.dbname then
+		local defaults = ns.dbdefaults or {}
+		_G[ns.dbname] = setmetatable(_G[ns.dbname] or {}, {__index = defaults})
+		ns.db = _G[ns.dbname]
+	end
+
+	if ns.dbpcname then
+		local defaults = ns.dbpcdefaults or {}
+		_G[ns.dbpcname] = setmetatable(_G[ns.dbpcname] or {}, {__index = defaults})
+		ns.dbpc = _G[ns.dbpcname]
+	end
+
+	if ns.OnLoad then
 		ns.OnLoad()
 		ns.OnLoad = nil
-		ProcessOnLoad = nil
-		if not ns.ADDON_LOADED then frame:UnregisterEvent("ADDON_LOADED") end
+	end
+
+	ProcessOnLoad = nil
+	if not ns.ADDON_LOADED then frame:UnregisterEvent("ADDON_LOADED") end
+
+	if ns.dbdefaults or ns.dbpcdefaults then ns.RegisterEvent("PLAYER_LOGOUT") end
+end
+
+
+-- Removes the default values from the db and dbpc as we're logging out
+local function ProcessLogout()
+	if ns.dbdefaults then
+		for i,v in pairs(ns.dbdefaults) do
+			if ns.db[i] == v then ns.db[i] = nil end
+		end
+	end
+
+	if ns.dbpcdefaults then
+		for i,v in pairs(ns.dbpcdefaults) do
+			if ns.dbpc[i] == v then ns.dbpc[i] = nil end
+		end
 	end
 end
 
@@ -32,5 +65,6 @@ end
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg1, ...)
 	if ProcessOnLoad and event == "ADDON_LOADED" then ProcessOnLoad(arg1) end
+	if event == "PLAYER_LOGOUT" then ProcessLogout() end
 	if ns[event] then ns[event](event, arg1, ...) end
 end)
