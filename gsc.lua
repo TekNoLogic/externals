@@ -26,6 +26,7 @@ function ns.GSC(cash, colorblind)
 		else return string.format(COPPER, c) end
 	else
 		if g > 0 and s == 0 and c == 0 then return string.format(GOLD, g)
+		elseif g > 99999 then return string.format(GS, g, s)
 		elseif g > 0 and c == 0 then return string.format(GS, g, s)
 		elseif g > 0 then return string.format(GSC, g, s, c)
 		elseif s > 0 and c == 0 then return string.format(SILVER, s)
