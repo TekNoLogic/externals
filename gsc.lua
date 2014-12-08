@@ -1,7 +1,7 @@
 
 local myname, ns = ...
 
-local GOLD, SILVER, COPPER = "|cffffd700%d", "|cffc7c7cf%02d", "|cffeda55f%02d"
+local GOLD, SILVER, COPPER = "|cffffd700%s", "|cffc7c7cf%02d", "|cffeda55f%02d"
 
 local GSC = string.join('.', GOLD, SILVER, COPPER)
 local GS  = string.join('.', GOLD, SILVER)
