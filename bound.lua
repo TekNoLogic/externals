@@ -28,5 +28,5 @@ end
 
 function ns.IsBindOnEquip(bag, slot)
 	ns.scantip:SetBagItem(bag, slot)
-	return Scan("Binds when equipped")
+	return Scan(ITEM_BIND_ON_EQUIP)
 end
