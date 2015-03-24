@@ -22,7 +22,7 @@ end
 
 function ns.IsAccountBound(bag, slot)
 	ns.scantip:SetBagItem(bag, slot)
-	return Scan("Battle.net Account Bound")
+	return Scan(ITEM_BNETACCOUNTBOUND) or Scan(ITEM_ACCOUNTBOUND)
 end
 
 
