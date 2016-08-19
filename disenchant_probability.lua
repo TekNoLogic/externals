@@ -1,8 +1,8 @@
 
 local myname, ns = ...
 local GetItemInfo = GetItemInfo
-local WEAPON = GetItemClassInfo(2)
-local ARMOR = GetItemClassInfo(4)
+local WEAPON = GetItemClassInfo(LE_ITEM_CLASS_WEAPON)
+local ARMOR = GetItemClassInfo(LE_ITEM_CLASS_ARMOR)
 
 
 -- I am lazy, so I "borrowed" these constants from Enchantrix ^^
