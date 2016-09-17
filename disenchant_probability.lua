@@ -1,5 +1,10 @@
 
 local myname, ns = ...
+
+
+assert(ns.ilvls, "ilvl external not loaded")
+
+
 local GetItemInfo = GetItemInfo
 local WEAPON = GetItemClassInfo(2)
 local ARMOR = GetItemClassInfo(4)
@@ -99,8 +104,10 @@ end
 --   num_qty  - A number representing the average qty received
 --   num_perc - A number representing the probability
 function ns.GetPossibleDisenchants(item)
-	local _, link, qual, ilvl, _, itemtype = GetItemInfo(item)
+	local _, link, qual, _, _, itemtype = GetItemInfo(item)
 	if not link or not ns.DEable(link) then return end
+
+	local ilvl = ns.ilvls[item]
 
 	if qual == 4 then -- Epic
 		if ilvl > 75 and ilvl <= 80 and itemtype == WEAPON then return NEXUS, "1-2x", "33%/66%", 5/3
