@@ -170,7 +170,7 @@ function ns.GetPossibleDisenchants(item)
 			return DRAENIC, "6x", "100%", 6, 1
 
 		elseif ilvl <= 810 then
-			return ARKHANA, "3x", "100%", 3, 1
+			return ARKHANA, "1-3x", "100%", 2, 1
 
 		end
 	end
