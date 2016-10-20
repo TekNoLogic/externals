@@ -39,20 +39,20 @@ end
 -- Creates a scrollbar
 -- Parent is required, offset and step are optional
 function ns.NewScrollBar(parent, offset, step)
-	local f = CreateFrame("Slider", nil, parent)
-	f:SetWidth(16)
+	local slider = CreateFrame("Slider", nil, parent)
+	slider:SetWidth(16)
 
-	f:SetPoint("TOP", 0, -16 - (offset or 0))
-	f:SetPoint("BOTTOM", 0, 16 + (offset or 0))
-	f:SetPoint("RIGHT", 0 - (offset or 0), 0)
+	slider:SetPoint("TOP", 0, -16 - (offset or 0))
+	slider:SetPoint("BOTTOM", 0, 16 + (offset or 0))
+	slider:SetPoint("RIGHT", 0 - (offset or 0), 0)
 
-	f:SetValueStep(step or 1)
+	slider:SetValueStep(step or 1)
 
-	f.Decrement = Decrement
-	f.Increment = Increment
+	slider.Decrement = Decrement
+	slider.Increment = Increment
 
-	local up = CreateFrame("Button", nil, f)
-	up:SetPoint("BOTTOM", f, "TOP")
+	local up = CreateFrame("Button", nil, slider)
+	up:SetPoint("BOTTOM", slider, "TOP")
 	up:SetSize(16, 16)
 	up:SetNormalTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
 	up:SetPushedTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down")
@@ -68,7 +68,7 @@ function ns.NewScrollBar(parent, offset, step)
 	up:SetScript("OnClick", OnClickUp)
 	up:SetScript("PostClick", Sound)
 
-	local down = CreateFrame("Button", nil, f)
+	local down = CreateFrame("Button", nil, slider)
 	down:SetPoint("TOP", f, "BOTTOM")
 	down:SetSize(16, 16)
 	down:SetNormalTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up")
@@ -85,8 +85,8 @@ function ns.NewScrollBar(parent, offset, step)
 	down:SetScript("OnClick", OnClickDown)
 	down:SetScript("PostClick", Sound)
 
-	f:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
-	local thumb = f:GetThumbTexture()
+	slider:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
+	local thumb = slider:GetThumbTexture()
 	thumb:SetSize(16, 24)
 	thumb:SetTexCoord(1/4, 3/4, 1/8, 7/8)
 
@@ -97,16 +97,15 @@ function ns.NewScrollBar(parent, offset, step)
 		if value == max then down:Disable() else down:Enable() end
 	end
 
-	f:HookScript("OnMinMaxChanged", UpdateUpDown)
-	f:HookScript("OnValueChanged", UpdateUpDown)
+	slider:HookScript("OnMinMaxChanged", UpdateUpDown)
+	slider:HookScript("OnValueChanged", UpdateUpDown)
 
-	local border = CreateFrame("Frame", nil, f)
+	local border = CreateFrame("Frame", nil, slider)
 	border:SetPoint("TOPLEFT", up, -5, 5)
 	border:SetPoint("BOTTOMRIGHT", down, 5, -3)
 	border:SetBackdrop(BACKDROP)
-	local r,g = TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g
-	local b,a = TOOLTIP_DEFAULT_COLOR.b, 0.5
-	border:SetBackdropBorderColor(r,g,b,a)
+	local color = TOOLTIP_DEFAULT_COLOR
+	border:SetBackdropBorderColor(color.r, color.g, color.b, 0.5)
 
-	return f, up, down, border
+	return slider, up, down, border
 end
