@@ -21,6 +21,24 @@ local function Increment(self)
 end
 
 
+local function OnMouseWheel(self, wheel_value)
+	if wheel_value < 0 then Increment(self) else Decrement(self) end
+end
+
+
+local proxies = {}
+local function OnMouseWheelProxy(self, ...)
+	return OnMouseWheel(proxies[self], ...)
+end
+
+
+local function AttachOnMouseWheel(self, frame)
+	proxies[frame] = self
+	frame:SetScript("OnMouseWheel", OnMouseWheelProxy)
+	frame:EnableMouseWheel(true)
+end
+
+
 local function OnClickUp(self)
 	self:GetParent():Decrement()
 end
@@ -36,20 +54,60 @@ local function Sound()
 end
 
 
--- Creates a scrollbar
--- Parent is required, offset and step are optional
-function ns.NewScrollBar(parent, offset, step)
+local ups, downs = {}, {}
+local function UpdateUpDown(self, value)
+	local up, down = ups[self], downs[self]
+	local min, max = self:GetMinMaxValues()
+	if value == min then up:Disable() else up:Enable() end
+	if value == max then down:Disable() else down:Enable() end
+end
+
+
+local function OnMinMaxChanged(self, min, max, ...)
+	local value = self:GetValue()
+
+	if value > max then
+		value = max
+		self:SetValue(value)
+	end
+	if value < min then
+		value = min
+		self:SetValue(value)
+	end
+
+	UpdateUpDown(self, value)
+
+	if self.OnMinMaxChanged then return self:OnMinMaxChanged(min, max, ...) end
+end
+
+
+local function OnValueChanged(self, ...)
+	UpdateUpDown(self, self:GetValue())
+	if self.OnValueChanged then return self:OnValueChanged(...) end
+end
+
+
+local OriginalSetScript
+local function SetScript(self, script, handler)
+	local existing = self:GetScript(script)
+	if existing then error("Cannot override ".. script) end
+	OriginalSetScript(self, script, handler)
+end
+
+
+function ns.CreateScrollBar(parent)
 	local slider = CreateFrame("Slider", nil, parent)
 	slider:SetWidth(16)
 
-	slider:SetPoint("TOP", 0, -16 - (offset or 0))
-	slider:SetPoint("BOTTOM", 0, 16 + (offset or 0))
-	slider:SetPoint("RIGHT", 0 - (offset or 0), 0)
-
-	slider:SetValueStep(step or 1)
-
+	OriginalSetScript = slider.SetScript
+	slider.SetScript = SetScript
 	slider.Decrement = Decrement
 	slider.Increment = Increment
+	slider.OnMouseWheel = OnMouseWheel
+	slider.AttachOnMouseWheel = AttachOnMouseWheel
+
+	slider:EnableMouseWheel(true)
+	slider:SetScript("OnMouseWheel", OnMouseWheel)
 
 	local up = CreateFrame("Button", nil, slider)
 	up:SetPoint("BOTTOM", slider, "TOP")
@@ -68,8 +126,10 @@ function ns.NewScrollBar(parent, offset, step)
 	up:SetScript("OnClick", OnClickUp)
 	up:SetScript("PostClick", Sound)
 
+	ups[slider] = up
+
 	local down = CreateFrame("Button", nil, slider)
-	down:SetPoint("TOP", f, "BOTTOM")
+	down:SetPoint("TOP", slider, "BOTTOM")
 	down:SetSize(16, 16)
 	down:SetNormalTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up")
 	down:SetPushedTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down")
@@ -85,20 +145,19 @@ function ns.NewScrollBar(parent, offset, step)
 	down:SetScript("OnClick", OnClickDown)
 	down:SetScript("PostClick", Sound)
 
+	downs[slider] = down
+
 	slider:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
 	local thumb = slider:GetThumbTexture()
 	thumb:SetSize(16, 24)
 	thumb:SetTexCoord(1/4, 3/4, 1/8, 7/8)
 
-	local function UpdateUpDown(self)
-		local min, max = self:GetMinMaxValues()
-		local value = self:GetValue()
-		if value == min then up:Disable() else up:Enable() end
-		if value == max then down:Disable() else down:Enable() end
-	end
+	slider:SetScript("OnMinMaxChanged", OnMinMaxChanged)
+	slider:SetScript("OnValueChanged", OnValueChanged)
 
-	slider:HookScript("OnMinMaxChanged", UpdateUpDown)
-	slider:HookScript("OnValueChanged", UpdateUpDown)
+	slider:SetMinMaxValues(0, 0)
+	slider:SetValueStep(1)
+	slider:SetValue(0)
 
 	local border = CreateFrame("Frame", nil, slider)
 	border:SetPoint("TOPLEFT", up, -5, 5)
