@@ -111,7 +111,11 @@ frame:SetScript("OnEvent", function(self, event, arg1, ...)
 	-- If we were loaded on demand, make sure a "PLAYER_LOGIN" message is sent
 	if event == "ADDON_LOADED" and arg1 == myname and IsLoggedIn() then
 		ns.SendMessage("PLAYER_LOGIN")
+		callbacks["PLAYER_LOGIN"] = nil
 	end
+
+	-- We don't need to hold on to these callbacks once the event has fired
+	if event == "PLAYER_LOGIN" then callbacks["PLAYER_LOGIN"] = nil end
 end)
 
 
