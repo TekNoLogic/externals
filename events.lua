@@ -50,13 +50,34 @@ function ns.UnregisterCallback(context, message)
 end
 
 
+local method, context_arg, message_arg
+local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26, arg27, arg28, arg29, arg30, arg31, arg32, arg33, arg34, arg35, arg36, arg37, arg38, arg39, arg40, arg41, arg42, arg43, arg44, arg45, arg46, arg47, arg48, arg49, arg50
+local function call()
+	method(context_arg, message_arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26, arg27, arg28, arg29, arg30, arg31, arg32, arg33, arg34, arg35, arg36, arg37, arg38, arg39, arg40, arg41, arg42, arg43, arg44, arg45, arg46, arg47, arg48, arg49, arg50)
+end
+
+
+local function errorhandler(err)
+	return geterrorhandler()(err)
+end
+
+
 function ns.SendMessage(message, ...)
 	assert(message, "`message` must not be nil")
+	assert(select("#", ...) <= 50, "Too many args!")
 	if not callbacks[message] then return end
 
 	for context,func in pairs(callbacks[message]) do
-		local success, error = pcall(func, context, message, ...)
-		if not success then geterrorhandler()(error) end
+		local old_arg1, old_arg2, old_arg3, old_arg4, old_arg5, old_arg6, old_arg7, old_arg8, old_arg9, old_arg10, old_arg11, old_arg12, old_arg13, old_arg14, old_arg15, old_arg16, old_arg17, old_arg18, old_arg19, old_arg20, old_arg21, old_arg22, old_arg23, old_arg24, old_arg25, old_arg26, old_arg27, old_arg28, old_arg29, old_arg30, old_arg31, old_arg32, old_arg33, old_arg34, old_arg35, old_arg36, old_arg37, old_arg38, old_arg39, old_arg40, old_arg41, old_arg42, old_arg43, old_arg44, old_arg45, old_arg46, old_arg47, old_arg48, old_arg49, old_arg50 = arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26, arg27, arg28, arg29, arg30, arg31, arg32, arg33, arg34, arg35, arg36, arg37, arg38, arg39, arg40, arg41, arg42, arg43, arg44, arg45, arg46, arg47, arg48, arg49, arg50
+		arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26, arg27, arg28, arg29, arg30, arg31, arg32, arg33, arg34, arg35, arg36, arg37, arg38, arg39, arg40, arg41, arg42, arg43, arg44, arg45, arg46, arg47, arg48, arg49, arg50 = ...
+
+		local old_method, old_context_arg, old_message_arg = method, context_arg, message_arg
+		method, context_arg, message_arg = func, context, message
+
+		xpcall(call, errorhandler)
+
+		method, context_arg, message_arg = old_method, old_context_arg, old_message_arg
+		arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26, arg27, arg28, arg29, arg30, arg31, arg32, arg33, arg34, arg35, arg36, arg37, arg38, arg39, arg40, arg41, arg42, arg43, arg44, arg45, arg46, arg47, arg48, arg49, arg50 = old_arg1, old_arg2, old_arg3, old_arg4, old_arg5, old_arg6, old_arg7, old_arg8, old_arg9, old_arg10, old_arg11, old_arg12, old_arg13, old_arg14, old_arg15, old_arg16, old_arg17, old_arg18, old_arg19, old_arg20, old_arg21, old_arg22, old_arg23, old_arg24, old_arg25, old_arg26, old_arg27, old_arg28, old_arg29, old_arg30, old_arg31, old_arg32, old_arg33, old_arg34, old_arg35, old_arg36, old_arg37, old_arg38, old_arg39, old_arg40, old_arg41, old_arg42, old_arg43, old_arg44, old_arg45, old_arg46, old_arg47, old_arg48, old_arg49, old_arg50
 	end
 end
 
