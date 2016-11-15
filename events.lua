@@ -26,6 +26,23 @@ local NOOP = function() end
 
 local callbacks = {}
 local frame = CreateFrame("Frame")
+local function RegisterFrame(event)
+	-- If the event name starts with an underscore then it's a custom message and
+	-- not an official event fired by the game engine
+	if event:sub(0,1) == "_" then return end
+
+	if next(callbacks[event]) then
+		if frame:IsEventRegistered(event) then return end
+
+		frame:RegisterEvent(event)
+		local registered = frame:IsEventRegistered(event)
+		assert(registered, "Unable to register for event '".. event.. "'")
+	else
+		frame:UnregisterEvent(event)
+	end
+end
+
+
 function ns.RegisterCallback(context, message, func)
 	-- Allow context-less calls like ns.RegisterCallback("PLAYER_LOGIN", OnLogin)
 	if type(context) == "string" and type(message) == "function" then
@@ -37,11 +54,7 @@ function ns.RegisterCallback(context, message, func)
 	if not callbacks[message] then callbacks[message] = {} end
 	callbacks[message][context] = func
 
-	if next(callbacks[message]) then
-		frame:RegisterEvent(message)
-	else
-		frame:UnregisterEvent(message)
-	end
+	RegisterFrame(message)
 end
 
 
